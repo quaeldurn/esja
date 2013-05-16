@@ -12,9 +12,9 @@
 int read_bit();
 int read_qit();
 typedef unsigned char word; // default word size = 8 bits
-int r[36];
+word r[35];	// defining registers
 
-int main() // returns 0 if successful shutdown, 1 for not
+int main() // the controle unit
 {
 	char cmnd[12];
 	void *mem = malloc(sizeof(word) * MEM_SIZE);	// mem allocation
@@ -54,7 +54,23 @@ int read_qit (word *c, int n) // reads qit n in byte c
 	}
 }
 
+int mov(int n, word r2) 
+{
+	r[n] = r2;
+}
 
+int add(int n, word r2)
+{
+	r[n] = r[n] + r2;
+}
+
+int terminal()
+{
+	char cmnd[24];
+	printf(">");
+	fgets(cmnd, sizeof(cmnd), stdin);
+	printf("%s\n", cmnd);
+}
 int access_fs(void *pntr) 
 {
 ;	
