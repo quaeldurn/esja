@@ -11,21 +11,18 @@
 
 int read_bit();
 int read_qit();
+
 typedef unsigned char word; // default word size = 8 bits
 word r[35];	// defining registers
+char cmnd[12], status = 'a';
 
 int main() // the controle unit
-{
-	char cmnd[12];
+{ 	
 	void *mem = malloc(sizeof(word) * MEM_SIZE);	// mem allocation
 	// MEM_SIZE*4 = total amount of qits
 	int quit_loop;
-	printf("number of available qits: %d\n", MEM_SIZE*4);
-	printf("Umriturnarrettur: Oll rettindi fraskilin\n");
 	while (quit_loop) {
-		printf(">");
-		scanf("%s", cmnd);
-		printf("\n");
+		terminal();
 	}
 }
 
@@ -66,10 +63,13 @@ int add(int n, word r2)
 
 int terminal()
 {
-	char cmnd[24];
+	if (status == 'a') {
+		printf("number of available qits: %d\n", MEM_SIZE*4);
+		printf("Umriturnarrettur: Oll rettindi fraskilin\n");
+		status = '0';
+	}
 	printf(">");
 	fgets(cmnd, sizeof(cmnd), stdin);
-	printf("%s\n", cmnd);
 }
 int access_fs(void *pntr) 
 {
