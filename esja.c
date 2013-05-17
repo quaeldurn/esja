@@ -1,4 +1,4 @@
-g`"#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,22 +8,29 @@ g`"#include <stdio.h>
 
 // make way to write and read *mem.
 // way to translate bin or dem to quat
-// way to directly change bit pairs to a qit value
+// way to write a qit in binary
+// need to make something to deal with cmnd[n]
 
 int read_bit();
 int read_qit();
+int terminal();
+int cu();
+
+int mov();
+int add();
 
 typedef unsigned char word; // default word size = 8 bits
 word r[35];	// defining registers
-char cmnd[3][11], status = 'a';
+char **cmnd = NULL, status = 'a';
 
 int main()
 { 	
+	cmnd = malloc(47);
 	void *mem = malloc(sizeof(word) * MEM_SIZE);	// mem allocation
 	int quit_loop;
 	while (quit_loop) {
 		terminal();
-		printf("%s", cmnd[1]);
+		control_unit();
 	}
 }
 
@@ -62,7 +69,7 @@ int add(int n, word r2)
 	r[n] = r[n] + r2;
 }
 
-int cu() // controle unit poop
+int cu() // controle unit
 {
 ;
 }
@@ -78,18 +85,12 @@ int terminal()
 	}
 	printf(">");
 	fgets(str, 47, stdin);
-	while (n < 4) {
-		if (n == 0) {
-			result = strtok(str, " ");
-			puts("yole");
-		}
-		printf("gyfh %d\n", result);
-		strcpy(result, cmnd[n]);
-		puts("lolo");
+	result = strtok(str, " ");
+	while (n < 4 && result != NULL) {
+		cmnd[n] = result;
+		//printf("%s\n", cmnd[n]);
 		result = strtok(NULL, " ");
-		puts("milf");
 		n++;
-		if (result == NULL) {break;puts("asht");}
 	}
 }
 int access_fs(void *pntr) 
