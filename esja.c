@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MEM_SIZE 1728 // always a multiplict of 12
 
@@ -14,15 +15,15 @@ int read_qit();
 
 typedef unsigned char word; // default word size = 8 bits
 word r[35];	// defining registers
-char cmnd[12], status = 'a';
+char cmnd[3][11], status = 'a';
 
-int main() // the controle unit
+int main()
 { 	
 	void *mem = malloc(sizeof(word) * MEM_SIZE);	// mem allocation
-	// MEM_SIZE*4 = total amount of qits
 	int quit_loop;
 	while (quit_loop) {
 		terminal();
+		printf("%s", cmnd[1]);
 	}
 }
 
@@ -61,15 +62,35 @@ int add(int n, word r2)
 	r[n] = r[n] + r2;
 }
 
+int cu() // controle unit
+{
+;
+}
+
 int terminal()
 {
+	char str[50], *result, n = 0;
+
 	if (status == 'a') {
 		printf("number of available qits: %d\n", MEM_SIZE*4);
 		printf("Umriturnarrettur: Oll rettindi fraskilin\n");
 		status = '0';
 	}
 	printf(">");
-	fgets(cmnd, sizeof(cmnd), stdin);
+	fgets(str, 47, stdin);
+	while (n < 4) {
+		if (n == 0) {
+			result = strtok(str, " ");
+			puts("yole");
+		}
+		printf("gyfh %d\n", result);
+		strcpy(result, cmnd[n]);
+		puts("lolo");
+		result = strtok(NULL, " ");
+		puts("milf");
+		n++;
+		if (result == NULL) {break;puts("asht");}
+	}
 }
 int access_fs(void *pntr) 
 {
