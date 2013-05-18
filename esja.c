@@ -10,27 +10,30 @@
 // way to translate bin or dem to quat
 // way to write a qit in binary
 // need to make something to deal with cmnd[n]
+// need to save *mem to a file on the hard disk with write() or something/
+
+typedef unsigned char word; // default word size = 8 bits
 
 int read_bit();
 int read_qit();
-int terminal();
-int cu();
+char **terminal();
+int control_unit(char **cmnd);
 
-int mov();
-int add();
+int mov(int n, word r2); // register n, expression
+int add(int n, word r2);
 
-typedef unsigned char word; // default word size = 8 bits
 word r[35];	// defining registers
-char **cmnd = NULL, status = 'a';
+char status = 'a';
+char **cmnd;
 
 int main()
 { 	
-	cmnd = malloc(47);
 	void *mem = malloc(sizeof(word) * MEM_SIZE);	// mem allocation
 	int quit_loop;
 	while (quit_loop) {
-		terminal();
-		control_unit();
+		cmnd = terminal();
+		printf("%dwoop", cmnd[0]);
+		control_unit(cmnd);
 	}
 }
 
@@ -69,14 +72,16 @@ int add(int n, word r2)
 	r[n] = r[n] + r2;
 }
 
-int cu() // controle unit
+int control_unit(char **cmnd) // controle unit
 {
-;
+	if (strcmp(cmnd[0], "exec") == 0) {
+		puts("ashtttt");
+	}
 }
 
-int terminal()
+char **terminal()
 {
-	char str[50], *result, n = 0;
+	char str[50], *result = NULL, n = 0;
 
 	if (status == 'a') {
 		printf("number of available qits: %d\n", MEM_SIZE*4);
@@ -87,18 +92,12 @@ int terminal()
 	fgets(str, 47, stdin);
 	result = strtok(str, " ");
 	while (n < 4 && result != NULL) {
-		cmnd[n] = result;
-		//printf("%s\n", cmnd[n]);
+		puts("swag");
+		cmnd[n] = strdup(result);
+		puts("yolo");
 		result = strtok(NULL, " ");
 		n++;
 	}
-}
-int access_fs(void *pntr) 
-{
-;	
-}
-
-int write_fs(void *pntr, int raw) // writes info to *(pntr+1)[x]
-{
-;	
+	printf("%p\n", cmnd[0]);
+	return cmnd;
 }
