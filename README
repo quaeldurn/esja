@@ -1,1 +1,5 @@
 Esja is a virtual qit CPU.
+
+Files:	A file consist of 2 parts: a beginning word which controls what type the file is (executable word, read word, 
+	write word or a mix of each other) and how big it is and the rest is data words.
+	
