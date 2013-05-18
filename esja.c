@@ -29,8 +29,8 @@ int main()
 	void *mem = malloc(sizeof(word) * MEM_SIZE);	// mem allocation
 	int quit_loop;
 	while (quit_loop) {
-		terminal();
-		control_unit();
+		terminal(); //gets a location of a block to execute
+		control_unit();  //executes the block
 	}
 }
 
@@ -77,6 +77,7 @@ int cu() // controle unit
 int terminal()
 {
 	char str[50], *result, n = 0;
+	long int location;
 
 	if (status == 'a') {
 		printf("number of available qits: %d\n", MEM_SIZE*4);
@@ -85,20 +86,11 @@ int terminal()
 	}
 	printf(">");
 	fgets(str, 47, stdin);
+	sscanf(str, "%lu", &location);
 	result = strtok(str, " ");
 	while (n < 4 && result != NULL) {
 		cmnd[n] = result;
-		//printf("%s\n", cmnd[n]);
 		result = strtok(NULL, " ");
 		n++;
 	}
-}
-int access_fs(void *pntr) 
-{
-;	
-}
-
-int write_fs(void *pntr, int raw) // writes info to *(pntr+1)[x]
-{
-;	
 }
