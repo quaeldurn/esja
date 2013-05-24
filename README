@@ -1,4 +1,4 @@
-Esja is a virtual qit CPU.
+Esja is a virtual crumb computer.
 
 UI:	You are greeted with a classic > and you're asked to type a 
 	location of a block to execute(needs to be an executable block, 
@@ -9,5 +9,8 @@ Files:	A file(i use the word block too) consist of 2 parts: a word(the
 	(as executable block, a read block, a write block or a mix of 
 	each other) and how big it is and the rest is data words.
 	
+Instructions:
 
+	There are 2 instruction in every data word with 3 operands for
+	each.
 	
