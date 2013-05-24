@@ -4,10 +4,10 @@ UI:	You are greeted with a classic > and you're asked to type a
 	location of a block to execute(needs to be an executable block, 
 	to clear that out).
 
-Files:	A file(i use the word block too) consist of 2 parts: a word(the
-	first word in the block) which controls how the file is treated
+Files:	A file(i use the word block too) consist of 2 parts: a base word
+	(the first word in the block) which controls how the file is treated
 	(as executable block, a read block, a write block or a mix of 
-	each other) and how big it is and the rest is data words.
+	each other) and how big it is; the rest of the file is data words.
 	
 Instructions:
 
