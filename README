@@ -1,5 +1,10 @@
 Esja is a virtual crumb computer.
 
+Role models:
+	The hardware(the part coded in C, esja.c for example) is based on 
+	the IBM PC 8086/87 and the software(the part that is kept in esja.ehd;
+	executable by exec()) is based on CP/M.
+
 UI:	You are greeted with a classic > and you're asked to type a 
 	location of a block to execute(needs to be an executable block, 
 	to clear that out).
@@ -11,6 +16,5 @@ Files:	A file(i use the word block too) consist of 2 parts: a base word
 	
 Instructions:
 
-	There are 2 instruction in every data word with 3 operands for
-	each.
+	UNDER THINKING
 	
