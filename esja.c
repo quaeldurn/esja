@@ -2,8 +2,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
-#define MEM_SIZE 1728 /* always a multiplict of 12 */
+#define MEM_SIZE 16384
 
 /* this program is licensed under the GNU GPLv3 */
 
@@ -16,8 +17,12 @@
  * a function (read or write e.g.) to execute
  * and the user could modifie and upgrade those 
  * functions from Esja. the wtd is only substitute
- * while i haven't finished that.
- */
+ * while i haven't finished that. Basicly making it
+ * a universal turing machine (to turnimate).
+ *
+ * note that the role model for this computer is the 
+ * IBM PC 8086
+ * */
 
 typedef uint16_t word;	/* default word, = 8 crumbs */
 
@@ -26,7 +31,7 @@ int exec(unsigned int bw_location);
 int wtder(int *wtd, unsigned int bw_location);
 
 int read_crumb(unsigned int location, unsigned int n);
-int write_crumb(unsigned int location, unsigned int n);
+int write_crumb(unsigned int location, unsigned int n, int v);
 int read_quats(unsigned int location, int end, int start);
 
 
@@ -39,12 +44,14 @@ word *mem;	/* main memory of Esja */
 
 int main()
 { 	
-	FILE *hard_disk = fopen("./mem.ehd", "w");	/* mem is saved to ./mem.esjaharddrive when shutdown */
+	/* mem is saved to ./mem.esjaharddrive when shutdown */
+	FILE *hard_disk = fopen("./mem.ehd", "w");	
 	mem = malloc(sizeof(word) * MEM_SIZE);		/* mem allocation */
+	fread(mem, sizeof(word), MEM_SIZE, hard_disk);
 	int wtd;
 
-	while (wtd != 9) {
-		wtd = -1;
+	while (wtd != -1) {
+		wtd = 9;
 		unsigned int bw_location;
 		bw_location = terminal(&wtd);	/* get the wtd and the file to work with */
 		wtder(&wtd, bw_location);
@@ -57,7 +64,7 @@ int main()
 unsigned int terminal(int *wtdpntr)
 {
 	char str[50];
-	unsigned int bw_location;
+	unsigned int bw_location, argument;
 
 	if (status == 1) {
 		printf("number of available crumbs: %d\n", MEM_SIZE * (sizeof(word)*8 / 2));
@@ -70,7 +77,10 @@ unsigned int terminal(int *wtdpntr)
 	return bw_location;	/* return location to the baseword */
 }
 
-/* executes a file with the bw_location, stops executing when it hits zero instruction */
+/* the processor,
+ * executes a file from the bw_location, stops executing when it hits
+ * a zero instruction.
+ * */
 int exec(unsigned int bw_location)
 {
 	int n;
@@ -83,20 +93,28 @@ int exec(unsigned int bw_location)
 /* what to do-er */
 int wtder(int *wtdpntr, unsigned int bw_location)
 {
+
 	printf("%drt\n", *wtdpntr);
-	if (*wtdpntr == 0) { /* a execute wtd */
-		puts("ht");
+	switch (*wtdpntr) {
+	case (0) : /* a execute wtd */
 		exec(bw_location);
-	} else if (*wtdpntr == 1) { /* the write wtd */
-		;
+	case (1) : /* the write/create file */
+		if (read_crumb(mem[bw_location]) == -2) { /* if the bw_location is uninitalized */
+			/* automaticly initilized it as an instruction,
+			 * i will add argumentation later 
+			 * */
+			write_crumb(bw_location, 0, 1);
+		}
 	}
 }
-
-int read_crumb(unsigned int location, unsigned int n)	/* reads crumb n in byte c */
+/* read_butt :
+ * 	a butt[er] is 4 crumbs(256 values)
+ * */
+int read_butt(unsigned int location, unsigned int n)
 {
 	if (n > 8) {
-		printf("read_crumb invalid index");	/* better error returnment? */
-		return 9;
+		fprintf(stderr, "read_crumb invalid index");
+		return -1;
 	}
 	if (((mem[location] >> n*2) & 1) == 0 
 			&& ((mem[location] >> n*2+1) & 1) == 0) {
@@ -110,54 +128,98 @@ int read_crumb(unsigned int location, unsigned int n)	/* reads crumb n in byte c
 	} else if (((mem[location] >> n*2) & 1) == 1 
 			&& ((mem[location] >> n*2+1) & 1) == 1) {
 		return 3;
+	} else if (mem[location] == 0) {
+		return -2; /*uninitalized word*/
 	}
 }
 
-int write_crumb(unsigned int location, unsigned int n) 
+/* writes a bit pair from v to word location at place n */
+int write_crumb(unsigned int location, unsigned int n, int v) 
 {
-	if (n > 8) {
-		printf("write_crumb invalid index");	/* i still need a error handler */
-	}
-
-	if (n == 0) {
+	switch (v) {
+	
+	/* write to v */
+	case (0):
 		mem[location] &= ~(1 << n*2);	/* set to 0 */
 		mem[location] &= ~(1 << n*2+1);	/* set to 0 */
-	} else if (n == 1) {
+	case (1): 
 		mem[location] &= ~(1 << n*2);	/* set to 0 */
 		mem[location] |= (1 << n*2+1);	/* set to 1 */
-	} else if (n == 2) {
+	case (2):
 		mem[location] |= (1 << n*2);	
 		mem[location] &= ~(1 << n*2+1);
-	} else if (n == 3) {
+	case (3):
 		mem[location] |= (1 << n*2);
 		mem[location] |= (1 << n*2+1);
+	default:
+		fprintf(stderr, "write_crumb invalid index");
 	}
+
 }
 
-int read_quats(unsigned int location, int end, int start)	/* reads a quaternary number, */
-{								/* need to make it safe. */
+/* reads a quaternary number,
+ * returns the equlivant dem.
+ *
+ * location : the word where %start is
+ * 
+ * */ 	
+int read_quats(unsigned int s_location, unsigned int e_location int end, int start)	
+{
 	unsigned int dem = 0, i = 1;
-	char n;
+	int n;
 
 	if (start <= end) {
-		return 1;
+		return -1;
 	}
 
 	for (n = start; n > end; n--) {
-		dem =+ i * (read_crumb(mem[location], n));
+		dem += i * (read_crumb(mem[location], n));
 		i *= 4;
 	}
 	return dem;
 }
 
+/* write a quaternary number from start to end, 
+ * */
+int write_quats(unsigned int location, int end, int start, int dem)
+{
+	int m, n = 1;
+	int digits[16384];
+	int i = 0;
+	
+	while (n) {
+		m = dem % 4;
+		digits[i] = {0, 1, 2, 3}[m];
+		n =/ base;
+		i++;
+	}
+
+	for (i; i > 0; i--) {
+		for (n; n > 0; n--) { /* for every word */
+			write_crumb();
+		}
+	}
+	
+}
+
 int read_bw(unsigned int bw_location) 
 {
 	if (read_crumb(mem[bw_location], 0) == 0) {
-		return 0;
-	} else if (read_crumb(mem[bw_location], 0) == 1 
-			&& read_crumb(mem[bw_location], 0) == 0) {
-		return 2;
-	} /* need to handle more flags */
+		return 0; /*location is data*/
+	} else if (read_crumb(mem[bw_location], 1) == 0 
+			&& read_crumb(mem[bw_location], 0) == 1) {
+		return 1; /*location is a instruction*/
+	} else if (read_crumb(mem[bw_location], 1) == -1) {
+		return -1; /* uninitalized word */
+	}
+	/* need to handle more flags */
+}
+
+int write_bw(unsigned int bw_location, int v) 
+{
+	if (v == 1) {
+		write_crumb(9,9,9);
+	}
 }
 
 int mov(int n, word r2) 
